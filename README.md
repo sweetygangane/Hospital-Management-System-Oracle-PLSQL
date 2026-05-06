@@ -1,4 +1,4 @@
-# 🏥 Hospital Management System (Oracle PL/SQL)
+# 🏥 Hospital Management System (Oracle PL/SQL)  - Clone
 
 This project contains a complete database design for a Hospital Management System.
 
