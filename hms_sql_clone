@@ -1,0 +1,930 @@
+-- =========================================
+-- HOSPITAL MANAGEMENT SYSTEM DATABASE
+-- SQL SERVER COMPLETE DATABASE SCRIPT
+-- =========================================
+
+CREATE DATABASE HMSDB
+GO
+
+USE HMSDB
+GO
+
+SET NOCOUNT ON
+GO
+
+-- =========================================
+-- MASTER TABLES
+-- =========================================
+
+CREATE TABLE Gender
+(
+    GenderID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(50),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE PatientCategory
+(
+    PatientCategoryID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE InsuranceCompany
+(
+    CompanyId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(200),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Nationality
+(
+    NationalityId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Country
+(
+    CountryID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    NationalityId INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE State
+(
+    StateID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    CountryID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE City
+(
+    CityID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    StateID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Relation
+(
+    RelationID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Department
+(
+    DepartmentId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(200),
+    IsClinical BIT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Unit
+(
+    UnitId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Ward
+(
+    WardId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    UnitId INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Room
+(
+    RoomId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    WardId INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Bed
+(
+    BedId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    WardId INT NULL,
+    RoomId INT NULL,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE ServiceCategory
+(
+    ServiceCategoryId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE ServiceType
+(
+    ServiceTypeId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Service
+(
+    ServiceId INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(200),
+    ServiceCategoryId INT,
+    Rate DECIMAL(18,2),
+    ServiceTypeId INT,
+    CompanyId INT NULL,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+-- STAFF / DOCTOR / PATIENT
+
+CREATE TABLE Staff
+(
+    StaffID INT PRIMARY KEY IDENTITY(1,1),
+    DepartmentID INT,
+    FirstName VARCHAR(100),
+    MiddleName VARCHAR(100),
+    LastName VARCHAR(100),
+    GenderID INT,
+    DateOfBirth DATE,
+    ContactNo1 VARCHAR(20),
+    ContactNo2 VARCHAR(20),
+    Email VARCHAR(200),
+    AddressLine1 VARCHAR(200),
+    AddressLine2 VARCHAR(200),
+    Pincode VARCHAR(20),
+    CityID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Doctor
+(
+    DoctorID INT PRIMARY KEY IDENTITY(1,1),
+    DepartmentID INT,
+    FirstName VARCHAR(100),
+    MiddleName VARCHAR(100),
+    LastName VARCHAR(100),
+    Qualification VARCHAR(100),
+    GenderID INT,
+    DateOfBirth DATE,
+    ContactNo1 VARCHAR(20),
+    ContactNo2 VARCHAR(20),
+    Email VARCHAR(200),
+    AddressLine1 VARCHAR(200),
+    AddressLine2 VARCHAR(200),
+    Pincode VARCHAR(20),
+    CityID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Patient
+(
+    PatientId INT PRIMARY KEY IDENTITY(1,1),
+    FirstName VARCHAR(100),
+    MiddleName VARCHAR(100),
+    LastName VARCHAR(100),
+    GenderID INT,
+    DateOfBirth DATE,
+    ContactNo1 VARCHAR(20),
+    ContactNo2 VARCHAR(20),
+    Email VARCHAR(200),
+    AddressLine1 VARCHAR(200),
+    AddressLine2 VARCHAR(200),
+    Pincode VARCHAR(20),
+    CityID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+-- VISIT & ADMISSION
+
+CREATE TABLE Visit
+(
+    VisitId INT PRIMARY KEY IDENTITY(1,1),
+    PatientCategoryID INT,
+    PatientId INT,
+    DoctorID INT,
+    UnitId INT,
+    VisitDate DATETIME,
+    OPDNumber INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Admission
+(
+    AdmissionId INT PRIMARY KEY IDENTITY(1,1),
+    PatientCategoryID INT,
+    PatientId INT,
+    UnitId INT,
+    DoctorID INT,
+    AdmissionDate DATETIME,
+    IPDNumber INT,
+    RelativeName VARCHAR(200),
+    RelationId INT,
+    BedId INT,
+    CompanyId INT,
+    IsMLC BIT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Discharge
+(
+    DischargeId INT PRIMARY KEY IDENTITY(1,1),
+    AdmissionId INT,
+    DoctorId INT,
+    DischargeDate DATETIME,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+-- BILLING
+
+CREATE TABLE Charge
+(
+    ChargeId INT PRIMARY KEY IDENTITY(1,1),
+    VisitId INT NULL,
+    AdmissionId INT NULL,
+    ServiceId INT,
+    Rate DECIMAL(18,2),
+    Amount DECIMAL(18,2),
+    Quantity INT,
+    Concession DECIMAL(18,2) DEFAULT 0,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE Bill
+(
+    BillId INT PRIMARY KEY IDENTITY(1,1),
+    VisitId INT NULL,
+    AdmissionId INT NULL,
+    TotalAmount DECIMAL(18,2),
+    Concession DECIMAL(18,2),
+    FinalBillAmount DECIMAL(18,2),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+-- USER MANAGEMENT
+
+CREATE TABLE [User]
+(
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    StaffID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE ApplicationFunctionality
+(
+    FunctionalityID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(200),
+    Level INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE AccessRights
+(
+    AccessRightID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT,
+    FunctionalityID INT,
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+-- DOCUMENT TABLES
+
+CREATE TABLE Prescription
+(
+    PrescriptionId INT PRIMARY KEY IDENTITY(1,1),
+    VisitId INT,
+    Path VARCHAR(500),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+
+CREATE TABLE ClinicalNote
+(
+    ClinicalNoteId INT PRIMARY KEY IDENTITY(1,1),
+    AdmissionId INT,
+    Path VARCHAR(500),
+    AddedBy INT,
+    UpdatedBy INT
+)
+GO
+-- FOREIGN KEYS
+
+ALTER TABLE Country
+ADD CONSTRAINT FK_Country_Nationality
+FOREIGN KEY (NationalityId)
+REFERENCES Nationality(NationalityId)
+GO
+
+ALTER TABLE State
+ADD CONSTRAINT FK_State_Country
+FOREIGN KEY (CountryID)
+REFERENCES Country(CountryID)
+GO
+
+ALTER TABLE City
+ADD CONSTRAINT FK_City_State
+FOREIGN KEY (StateID)
+REFERENCES State(StateID)
+GO
+
+ALTER TABLE Ward
+ADD CONSTRAINT FK_Ward_Unit
+FOREIGN KEY (UnitId)
+REFERENCES Unit(UnitId)
+GO
+
+ALTER TABLE Room
+ADD CONSTRAINT FK_Room_Ward
+FOREIGN KEY (WardId)
+REFERENCES Ward(WardId)
+GO
+
+ALTER TABLE Bed
+ADD CONSTRAINT FK_Bed_Ward
+FOREIGN KEY (WardId)
+REFERENCES Ward(WardId)
+GO
+
+ALTER TABLE Bed
+ADD CONSTRAINT FK_Bed_Room
+FOREIGN KEY (RoomId)
+REFERENCES Room(RoomId)
+GO
+
+ALTER TABLE Service
+ADD CONSTRAINT FK_Service_Category
+FOREIGN KEY (ServiceCategoryId)
+REFERENCES ServiceCategory(ServiceCategoryId)
+GO
+
+ALTER TABLE Service
+ADD CONSTRAINT FK_Service_Type
+FOREIGN KEY (ServiceTypeId)
+REFERENCES ServiceType(ServiceTypeId)
+GO
+
+ALTER TABLE Staff
+ADD CONSTRAINT FK_Staff_Department
+FOREIGN KEY (DepartmentID)
+REFERENCES Department(DepartmentId)
+GO
+
+ALTER TABLE Staff
+ADD CONSTRAINT FK_Staff_Gender
+FOREIGN KEY (GenderID)
+REFERENCES Gender(GenderID)
+GO
+
+ALTER TABLE Staff
+ADD CONSTRAINT FK_Staff_City
+FOREIGN KEY (CityID)
+REFERENCES City(CityID)
+GO
+
+ALTER TABLE Doctor
+ADD CONSTRAINT FK_Doctor_Department
+FOREIGN KEY (DepartmentID)
+REFERENCES Department(DepartmentId)
+GO
+
+ALTER TABLE Doctor
+ADD CONSTRAINT FK_Doctor_Gender
+FOREIGN KEY (GenderID)
+REFERENCES Gender(GenderID)
+GO
+
+ALTER TABLE Doctor
+ADD CONSTRAINT FK_Doctor_City
+FOREIGN KEY (CityID)
+REFERENCES City(CityID)
+GO
+
+ALTER TABLE Patient
+ADD CONSTRAINT FK_Patient_Gender
+FOREIGN KEY (GenderID)
+REFERENCES Gender(GenderID)
+GO
+
+ALTER TABLE Patient
+ADD CONSTRAINT FK_Patient_City
+FOREIGN KEY (CityID)
+REFERENCES City(CityID)
+GO
+
+ALTER TABLE Visit
+ADD CONSTRAINT FK_Visit_Patient
+FOREIGN KEY (PatientId)
+REFERENCES Patient(PatientId)
+GO
+
+ALTER TABLE Visit
+ADD CONSTRAINT FK_Visit_Doctor
+FOREIGN KEY (DoctorID)
+REFERENCES Doctor(DoctorID)
+GO
+
+ALTER TABLE Admission
+ADD CONSTRAINT FK_Admission_Patient
+FOREIGN KEY (PatientId)
+REFERENCES Patient(PatientId)
+GO
+
+ALTER TABLE Admission
+ADD CONSTRAINT FK_Admission_Doctor
+FOREIGN KEY (DoctorID)
+REFERENCES Doctor(DoctorID)
+GO
+
+ALTER TABLE Admission
+ADD CONSTRAINT FK_Admission_Bed
+FOREIGN KEY (BedId)
+REFERENCES Bed(BedId)
+GO
+
+ALTER TABLE Charge
+ADD CONSTRAINT FK_Charge_Visit
+FOREIGN KEY (VisitId)
+REFERENCES Visit(VisitId)
+GO
+
+ALTER TABLE Charge
+ADD CONSTRAINT FK_Charge_Admission
+FOREIGN KEY (AdmissionId)
+REFERENCES Admission(AdmissionId)
+GO
+
+ALTER TABLE Charge
+ADD CONSTRAINT FK_Charge_Service
+FOREIGN KEY (ServiceId)
+REFERENCES Service(ServiceId)
+GO
+
+ALTER TABLE Bill
+ADD CONSTRAINT FK_Bill_Visit
+FOREIGN KEY (VisitId)
+REFERENCES Visit(VisitId)
+GO
+
+ALTER TABLE Bill
+ADD CONSTRAINT FK_Bill_Admission
+FOREIGN KEY (AdmissionId)
+REFERENCES Admission(AdmissionId)
+GO
+
+ALTER TABLE [User]
+ADD CONSTRAINT FK_User_Staff
+FOREIGN KEY (StaffID)
+REFERENCES Staff(StaffID)
+GO
+
+ALTER TABLE AccessRights
+ADD CONSTRAINT FK_AccessRights_User
+FOREIGN KEY (UserID)
+REFERENCES [User](UserID)
+GO
+
+ALTER TABLE AccessRights
+ADD CONSTRAINT FK_AccessRights_Functionality
+FOREIGN KEY (FunctionalityID)
+REFERENCES ApplicationFunctionality(FunctionalityID)
+GO
+
+ALTER TABLE Prescription
+ADD CONSTRAINT FK_Prescription_Visit
+FOREIGN KEY (VisitId)
+REFERENCES Visit(VisitId)
+GO
+
+ALTER TABLE ClinicalNote
+ADD CONSTRAINT FK_ClinicalNote_Admission
+FOREIGN KEY (AdmissionId)
+REFERENCES Admission(AdmissionId)
+GO
+
+PRINT 'HMS DATABASE CREATED SUCCESSFULLY'
+GO
+SET NOCOUNT ON
+
+PRINT '================ MASTER DATA INSERT ================'
+-- Patient Category
+INSERT INTO PatientCategory(Name,AddedBy,UpdatedBy)
+VALUES
+('Self',1,1),
+('Company',1,1),
+('Staff',1,1),
+('StaffDependent',1,1)
+-- Department
+INSERT INTO Department(Name,IsClinical,AddedBy,UpdatedBy)
+VALUES
+('Cardiology',1,1,1),
+('Gynaecology',1,1,1),
+('Medicine',1,1,1),
+('Nephrology',1,1,1),
+('Ophthalmology',1,1,1),
+('Orthopedic',1,1,1),
+('Paediatrics',1,1,1),
+('Physiotherapy',1,1,1),
+('Neurology',1,1,1),
+('Surgery',1,1,1),
+('Dental',1,1,1),
+('ENT',1,1,1),
+('Administration',0,1,1),
+('Reception',0,1,1),
+('Billing',0,1,1),
+('Store',0,1,1),
+('Account',0,1,1),
+('Maintainance',0,1,1),
+('Bio-Medical',0,1,1),
+('Computer(IT)',0,1,1),
+('Pathology',0,1,1),
+('Radiology',0,1,1),
+('Nursing',0,1,1),
+('Pharmacy',0,1,1)
+-- Gender
+INSERT INTO Gender(Name,AddedBy,UpdatedBy)
+VALUES
+('Male',1,1),
+('Female',1,1)
+-- Insurance Company
+INSERT INTO InsuranceCompany(Name,AddedBy,UpdatedBy)
+VALUES
+('Star Health',1,1),
+('Vidal Healthcare',1,1),
+('Aditya Birla',1,1),
+('HDFC Ergo',1,1),
+('ICICI Lombard',1,1),
+('The Oriental Insurance Company',1,1),
+('Care Health Insurance',1,1)
+-- Nationality
+INSERT INTO Nationality(Name,AddedBy,UpdatedBy)
+VALUES
+('Indian',1,1)
+-- Relation
+INSERT INTO Relation(Name,AddedBy,UpdatedBy)
+VALUES
+('Self',1,1),
+('Spouse',1,1),
+('Child',1,1),
+('Friend',1,1),
+('Father',1,1),
+('Mother',1,1),
+('Son',1,1),
+('Brother',1,1),
+('Sister',1,1),
+('Daughter',1,1),
+('Sister In Law',1,1),
+('Brother In Law',1,1),
+('Grand Father',1,1),
+('Grand Mother',1,1)
+-- Service Category
+INSERT INTO ServiceCategory(Name,AddedBy,UpdatedBy)
+VALUES
+('Cardiology',1,1),
+('Gynaecology',1,1),
+('Medicine',1,1),
+('Nephrology',1,1),
+('Ophthalmology',1,1),
+('Orthopedic',1,1),
+('Paediatrics',1,1),
+('Physiotherapy',1,1),
+('Neurology',1,1),
+('Surgery',1,1),
+('Dental',1,1),
+('ENT',1,1),
+('Pathology',1,1),
+('Radiology',1,1),
+('Nursing',1,1)
+-- Unit
+INSERT INTO Unit(Name,AddedBy,UpdatedBy)
+VALUES
+('Unit 1',1,1),
+('Unit 2',1,1),
+('Unit 3',1,1),
+('Unit 4',1,1),
+('Unit 5',1,1)
+-- Ward
+INSERT INTO Ward(Name,UnitId,AddedBy,UpdatedBy)
+VALUES
+('General Ward',1,1,1),
+('Male Ward',1,1,1),
+('Female Ward',1,1,1),
+('Pediatric Ward',1,1,1),
+('Special Ward',1,1,1),
+('Semi Special Ward',1,1,1),
+('General Ward II',1,1,1)
+-- Room
+INSERT INTO Room(Name,WardId,AddedBy,UpdatedBy)
+VALUES
+('Room 1',5,1,1),
+('Room 2',5,1,1),
+('Room 3',5,1,1),
+('Room 4',5,1,1),
+('Room 5',5,1,1),
+('Room 6',5,1,1),
+('Room 7',5,1,1),
+('Room 8',6,1,1),
+('Room 9',6,1,1),
+('Room 10',6,1,1),
+('Room 11',7,1,1),
+('Room 12',7,1,1),
+('Room 13',7,1,1)
+-- Bed Insert
+DECLARE @i INT=1
+
+WHILE(@i<=20)
+BEGIN
+    INSERT INTO Bed(Name,WardId,RoomId,AddedBy,UpdatedBy)
+    VALUES('Bed-'+CAST(@i AS VARCHAR(5)),1,NULL,1,1)
+
+    SET @i=@i+1
+END
+
+SET @i=1
+
+WHILE(@i<=20)
+BEGIN
+    INSERT INTO Bed(Name,WardId,RoomId,AddedBy,UpdatedBy)
+    VALUES('Bed-'+CAST(@i AS VARCHAR(5)),2,NULL,1,1)
+
+    SET @i=@i+1
+END
+
+SET @i=1
+
+WHILE(@i<=5)
+BEGIN
+    INSERT INTO Bed(Name,WardId,RoomId,AddedBy,UpdatedBy)
+    VALUES('Bed-'+CAST(@i AS VARCHAR(5)),NULL,1,1,1)
+
+    SET @i=@i+1
+END
+
+SET @i=1
+
+WHILE(@i<=5)
+BEGIN
+    INSERT INTO Bed(Name,WardId,RoomId,AddedBy,UpdatedBy)
+    VALUES('Bed-'+CAST(@i AS VARCHAR(5)),NULL,2,1,1)
+
+    SET @i=@i+1
+END
+-- Country / State / City
+INSERT INTO Country(Name,NationalityId,AddedBy,UpdatedBy)
+VALUES('India',1,1,1)
+
+INSERT INTO State(Name,CountryId,AddedBy,UpdatedBy)
+VALUES('Maharashtra',1,1,1)
+
+INSERT INTO City(Name,StateId,AddedBy,UpdatedBy)
+VALUES
+('Pune',1,1,1),
+('Nagpur',1,1,1),
+('Mumbai',1,1,1),
+('Nashik',1,1,1),
+('Washim',1,1,1)
+
+-- Service Type
+INSERT INTO ServiceType(Name,AddedBy,UpdatedBy)
+VALUES
+('OPD',1,1),
+('IPD-General',1,1),
+('IPD-Special',1,1)
+
+PRINT '================ STAFF INSERT ================'
+
+-- Staff Insert
+
+DECLARE @MinDeptId INT
+DECLARE @MaxDeptId INT
+
+SELECT @MinDeptId=MIN(DepartmentId),
+       @MaxDeptId=MAX(DepartmentId)
+FROM Department
+WHERE IsClinical=0
+
+WHILE(@MinDeptId<=@MaxDeptId)
+BEGIN
+
+    SET @i=1
+
+    WHILE(@i<=10)
+    BEGIN
+
+        INSERT INTO Staff
+        (
+            DepartmentID,
+            FirstName,
+            MiddleName,
+            LastName,
+            GenderID,
+            DateOfBirth,
+            ContactNo1,
+            ContactNo2,
+            Email,
+            AddressLine1,
+            AddressLine2,
+            Pincode,
+            CityID,
+            AddedBy,
+            UpdatedBy
+        )
+        VALUES
+        (
+            @MinDeptId,
+            'SFname-'+CAST(@MinDeptId AS VARCHAR(5))+'-'+CAST(@i AS VARCHAR(5)),
+            'SMname-'+CAST(@MinDeptId AS VARCHAR(5))+'-'+CAST(@i AS VARCHAR(5)),
+            'SLname-'+CAST(@MinDeptId AS VARCHAR(5))+'-'+CAST(@i AS VARCHAR(5)),
+            (SELECT TOP 1 GenderId FROM Gender ORDER BY NEWID()),
+            DATEADD(DAY,-10000,GETDATE()),
+            '1234567890',
+            '1234567890',
+            'staff'+CAST(@i AS VARCHAR)+'@gmail.com',
+            'Address Line 1',
+            'Address Line 2',
+            '123456',
+            (SELECT TOP 1 CityId FROM City ORDER BY NEWID()),
+            1,
+            1
+        )
+
+        SET @i=@i+1
+    END
+
+    SET @MinDeptId=@MinDeptId+1
+END
+
+PRINT '================ DOCTOR INSERT ================'
+-- Doctor Insert
+SELECT @MinDeptId=MIN(DepartmentId),
+       @MaxDeptId=MAX(DepartmentId)
+FROM Department
+WHERE IsClinical=1
+
+WHILE(@MinDeptId<=@MaxDeptId)
+BEGIN
+
+    SET @i=1
+
+    WHILE(@i<=3)
+    BEGIN
+
+        INSERT INTO Doctor
+        (
+            DepartmentID,
+            FirstName,
+            MiddleName,
+            LastName,
+            Qualification,
+            GenderID,
+            DateOfBirth,
+            ContactNo1,
+            ContactNo2,
+            Email,
+            AddressLine1,
+            AddressLine2,
+            Pincode,
+            CityID,
+            AddedBy,
+            UpdatedBy
+        )
+        VALUES
+        (
+            @MinDeptId,
+            'DrFname-'+CAST(@MinDeptId AS VARCHAR(5))+'-'+CAST(@i AS VARCHAR(5)),
+            'DrMname-'+CAST(@MinDeptId AS VARCHAR(5))+'-'+CAST(@i AS VARCHAR(5)),
+            'DrLname-'+CAST(@MinDeptId AS VARCHAR(5))+'-'+CAST(@i AS VARCHAR(5)),
+            'MBBS,MD',
+            (SELECT TOP 1 GenderId FROM Gender ORDER BY NEWID()),
+            DATEADD(DAY,-10000,GETDATE()),
+            '9999999999',
+            '8888888888',
+            'doctor'+CAST(@i AS VARCHAR)+'@gmail.com',
+            'Doctor Address 1',
+            'Doctor Address 2',
+            '440001',
+            (SELECT TOP 1 CityId FROM City ORDER BY NEWID()),
+            1,
+            1
+        )
+
+        SET @i=@i+1
+    END
+
+    SET @MinDeptId=@MinDeptId+1
+END
+
+PRINT '================ PATIENT INSERT ================'
+
+-----------------------------------------------------
+-- Patient Insert
+-----------------------------------------------------
+SET @i=1
+
+WHILE(@i<=1000)
+BEGIN
+
+    INSERT INTO Patient
+    (
+        FirstName,
+        MiddleName,
+        LastName,
+        GenderID,
+        DateOfBirth,
+        ContactNo1,
+        ContactNo2,
+        Email,
+        AddressLine1,
+        AddressLine2,
+        Pincode,
+        CityID,
+        AddedBy,
+        UpdatedBy
+    )
+    VALUES
+    (
+        'PatientFname'+CAST(@i AS VARCHAR(10)),
+        'PatientMname'+CAST(@i AS VARCHAR(10)),
+        'PatientLname'+CAST(@i AS VARCHAR(10)),
+        (SELECT TOP 1 GenderId FROM Gender ORDER BY NEWID()),
+        DATEADD(YEAR,-25,GETDATE()),
+        '9876543210',
+        '9876543211',
+        'patient'+CAST(@i AS VARCHAR)+'@gmail.com',
+        'Patient Address 1',
+        'Patient Address 2',
+        '411001',
+        (SELECT TOP 1 CityId FROM City ORDER BY NEWID()),
+        1,
+        1
+    )
+
+    SET @i=@i+1
+END
+
+PRINT '================ COMPLETED ================='
+
+Find patient visit details with doctor name.
+SELECT 
+V.VisitId,
+P.FirstName AS PatientName,
+D.FirstName AS DoctorName,
+V.VisitDate
+FROM Visit V
+INNER JOIN Patient P
+ON V.PatientId = P.PatientId
+INNER JOIN Doctor D
+ON V.DoctorID = D.DoctorID
